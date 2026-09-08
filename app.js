@@ -102,7 +102,7 @@ function createUnit(id, defaultDenom) {
       <td>${cumulative.toLocaleString()}</td>
     `;
     state.logBody.prepend(tr);
-    while (state.logBody.children.length > 20) state.logBody.removeChild(state.logBody.lastChild);
+    while (state.logBody.children.length > 500) state.logBody.removeChild(state.logBody.lastChild);
   }
 
   state.spin = function () {
