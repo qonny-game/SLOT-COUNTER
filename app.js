@@ -1,9 +1,11 @@
 const container = document.getElementById('scrollWrap');
 const masterToggle = document.getElementById('masterToggle');
 const resetAllBtn = document.getElementById('resetAllBtn');
+const totalOutShared = document.getElementById('totalOutShared');
 const units = [];
 let masterRunning = false;
 let masterTimer = null;
+let sharedTotal = 0;
 
 const DEFAULTS = [629, 600, 550];
 const STORAGE_KEY = 'slot-counter-denoms';
@@ -56,14 +58,10 @@ function createUnit(id, defaultDenom) {
       </div>
     </div>
 
-    <div class="stats-row">
-      <div class="stat-cell"><p>総G</p><p id="totalOut-${id}">0</p></div>
-      <div class="stat-cell"><p>平均G</p><p id="avgGapOut-${id}">-</p></div>
-      <div class="stat-cell"><p>中央値</p><p id="medianGapOut-${id}">-</p></div>
-    </div>
-
-    <div class="prob-row">
-      <span>実確率 </span><span id="probOut-${id}">-</span>
+    <div class="stats-line">
+      <span>実確率 <b id="probOut-${id}">-</b></span>
+      <span>平均 <b id="avgGapOut-${id}">-</b></span>
+      <span>中央値 <b id="medianGapOut-${id}">-</b></span>
     </div>
 
     <div class="log-wrap">
@@ -81,7 +79,6 @@ function createUnit(id, defaultDenom) {
   const state = {
     id, total: 0, hits: 0, sinceLast: 0, gaps: [],
     denomInput: document.getElementById(`denom-${id}`),
-    totalOut: document.getElementById(`totalOut-${id}`),
     hitOut: document.getElementById(`hitOut-${id}`),
     sinceOut: document.getElementById(`sinceOut-${id}`),
     flashBg: document.getElementById(`flashBg-${id}`),
@@ -126,7 +123,6 @@ function createUnit(id, defaultDenom) {
       void state.flashBg.offsetWidth;
       state.flashBg.classList.add('playing');
     }
-    state.totalOut.textContent = state.total.toLocaleString();
     state.hitOut.textContent = state.hits.toLocaleString();
     state.sinceOut.textContent = state.sinceLast.toLocaleString();
     state.probOut.textContent = state.hits > 0 ? `1/${(state.total / state.hits).toFixed(1)}` : '-';
@@ -139,7 +135,6 @@ function createUnit(id, defaultDenom) {
 
   state.reset = function () {
     state.total = 0; state.hits = 0; state.sinceLast = 0; state.gaps = [];
-    state.totalOut.textContent = '0';
     state.hitOut.textContent = '0';
     state.sinceOut.textContent = '0';
     state.probOut.textContent = '-';
@@ -158,7 +153,11 @@ function setMasterRunning(running) {
   if (masterRunning) {
     masterToggle.innerHTML = '<i class="ti ti-player-pause"></i>OFF';
     units.forEach(u => u.denomInput.disabled = true);
-    masterTimer = setInterval(() => units.forEach(u => u.spin()), 15);
+    masterTimer = setInterval(() => {
+      units.forEach(u => u.spin());
+      sharedTotal++;
+      totalOutShared.textContent = sharedTotal.toLocaleString();
+    }, 15);
   } else {
     masterToggle.innerHTML = '<i class="ti ti-player-play"></i>ON';
     units.forEach(u => u.denomInput.disabled = false);
@@ -170,6 +169,8 @@ masterToggle.addEventListener('click', () => setMasterRunning(!masterRunning));
 resetAllBtn.addEventListener('click', () => {
   setMasterRunning(false);
   units.forEach(u => u.reset());
+  sharedTotal = 0;
+  totalOutShared.textContent = '0';
 });
 
 DEFAULTS.forEach((denom, i) => createUnit(i + 1, denom));
