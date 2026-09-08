@@ -96,9 +96,9 @@ function createUnit(id, defaultDenom) {
     saveDenom(id, state.denomInput.value);
   });
 
-  function addRow(hitNum, gap, cumulative, actualProb, setProb) {
+  function addRow(hitNum, gap, cumulative, gapSetTarget) {
     const tr = document.createElement('tr');
-    if (actualProb > setProb) tr.classList.add('row-good');
+    if (gap < gapSetTarget) tr.classList.add('row-good');
     tr.innerHTML = `
       <td>${hitNum}</td>
       <td>${gap.toLocaleString()}</td>
@@ -120,7 +120,7 @@ function createUnit(id, defaultDenom) {
       state.gaps.push(state.sinceLast);
       state.emptyState.style.display = 'none';
       const actualProb = state.hits / state.total;
-      addRow(state.hits, state.sinceLast, state.total, actualProb, prob);
+      addRow(state.hits, state.sinceLast, state.total, denom);
       state.sinceLast = 0;
       state.flashBg.classList.remove('playing');
       void state.flashBg.offsetWidth;
