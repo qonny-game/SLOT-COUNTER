@@ -73,6 +73,14 @@ function createUnit(id, defaultDenom) {
       </table>
       <div class="empty-state" id="emptyState-${id}">なし</div>
     </div>
+
+    <div class="worst-wrap">
+      <p class="worst-title">ワースト5</p>
+      <table>
+        <tbody id="worstBody-${id}"></tbody>
+      </table>
+      <div class="empty-state" id="worstEmpty-${id}">なし</div>
+    </div>
   `;
   container.appendChild(wrap);
 
@@ -87,6 +95,9 @@ function createUnit(id, defaultDenom) {
     medianGapOut: document.getElementById(`medianGapOut-${id}`),
     logBody: document.getElementById(`logBody-${id}`),
     emptyState: document.getElementById(`emptyState-${id}`),
+    worstBody: document.getElementById(`worstBody-${id}`),
+    worstEmpty: document.getElementById(`worstEmpty-${id}`),
+    worstList: [],
   };
 
   state.denomInput.addEventListener('change', () => {
@@ -102,7 +113,21 @@ function createUnit(id, defaultDenom) {
       <td>${cumulative.toLocaleString()}</td>
     `;
     state.logBody.prepend(tr);
-    while (state.logBody.children.length > 500) state.logBody.removeChild(state.logBody.lastChild);
+    while (state.logBody.children.length > 3000) state.logBody.removeChild(state.logBody.lastChild);
+  }
+
+  function updateWorst(hitNum, gap, cumulative) {
+    state.worstList.push({ hitNum, gap, cumulative });
+    state.worstList.sort((a, b) => b.gap - a.gap);
+    if (state.worstList.length > 5) state.worstList.length = 5;
+    state.worstEmpty.style.display = 'none';
+    state.worstBody.innerHTML = state.worstList.map(w => `
+      <tr>
+        <td>${w.hitNum}</td>
+        <td>${w.gap.toLocaleString()}</td>
+        <td>${w.cumulative.toLocaleString()}</td>
+      </tr>
+    `).join('');
   }
 
   state.spin = function () {
@@ -118,6 +143,7 @@ function createUnit(id, defaultDenom) {
       state.emptyState.style.display = 'none';
       const actualProb = state.hits / state.total;
       addRow(state.hits, state.sinceLast, state.total, denom);
+      updateWorst(state.hits, state.sinceLast, state.total);
       state.sinceLast = 0;
       state.flashBg.classList.remove('playing');
       void state.flashBg.offsetWidth;
@@ -134,7 +160,7 @@ function createUnit(id, defaultDenom) {
   };
 
   state.reset = function () {
-    state.total = 0; state.hits = 0; state.sinceLast = 0; state.gaps = [];
+    state.total = 0; state.hits = 0; state.sinceLast = 0; state.gaps = []; state.worstList = [];
     state.hitOut.textContent = '0';
     state.sinceOut.textContent = '0';
     state.probOut.textContent = '-';
@@ -143,6 +169,8 @@ function createUnit(id, defaultDenom) {
     state.logBody.innerHTML = '';
     state.emptyState.style.display = 'block';
     state.flashBg.classList.remove('playing');
+    state.worstBody.innerHTML = '';
+    state.worstEmpty.style.display = 'block';
   };
 
   units.push(state);
