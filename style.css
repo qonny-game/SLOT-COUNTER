@@ -87,7 +87,8 @@ body {
 }
 
 .unit {
-  flex: 0 0 200px;
+  flex: 0 0 83vw;
+  max-width: 340px;
   background: var(--surface-2);
   border: 0.5px solid var(--border);
   border-radius: 10px;
