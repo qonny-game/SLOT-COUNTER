@@ -148,16 +148,21 @@ function createUnit(id, defaultDenom) {
   units.push(state);
 }
 
+const SPINS_PER_TICK = 20;
+const TICK_MS = 15;
+
 function setMasterRunning(running) {
   masterRunning = running;
   if (masterRunning) {
     masterToggle.innerHTML = '<i class="ti ti-player-pause"></i>OFF';
     units.forEach(u => u.denomInput.disabled = true);
     masterTimer = setInterval(() => {
-      units.forEach(u => u.spin());
-      sharedTotal++;
+      for (let i = 0; i < SPINS_PER_TICK; i++) {
+        units.forEach(u => u.spin());
+        sharedTotal++;
+      }
       totalOutShared.textContent = sharedTotal.toLocaleString();
-    }, 15);
+    }, TICK_MS);
   } else {
     masterToggle.innerHTML = '<i class="ti ti-player-play"></i>ON';
     units.forEach(u => u.denomInput.disabled = false);
