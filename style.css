@@ -14,6 +14,23 @@
   --hit-good-row: #faece7;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-page: #17171a;
+    --surface-1: #232326;
+    --surface-2: #1d1d20;
+    --border: #38383c;
+    --border-strong: #4a4a4f;
+    --text-primary: #f1efe8;
+    --text-secondary: #b4b2a9;
+    --text-muted: #706f6a;
+    --accent-bg: #0c447c;
+    --accent-text: #85b7eb;
+    --hit-bg: #791f1f;
+    --hit-good-row: #4a1b0c;
+  }
+}
+
 * {
   box-sizing: border-box;
 }
